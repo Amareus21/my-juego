@@ -1,12 +1,22 @@
 "use client";
 
 import { BlurFilter } from "pixi.js";
-import { Stage, Container, Sprite, Text, useTick } from "@pixi/react";
-import { useMemo, useState } from "react";
+import {
+  Stage,
+  Container,
+  AnimatedSprite,
+  Sprite,
+  Text,
+  useTick,
+} from "@pixi/react";
+import { useEffect, useMemo, useState } from "react";
 import { useApp } from "@pixi/react";
+import Image from "next/image";
 
 export default function MyComponent() {
   const [key, setKey] = useState("");
+  const width = 1200;
+  const height = 700;
 
   const handleDownKey = (e) => {
     setKey(e.key);
@@ -15,44 +25,112 @@ export default function MyComponent() {
     setKey("");
   };
   return (
-    <Stage
-      width={1000}
-      options={{ backgroundColor: 0x000000 }}
-      renderOnComponentChange={true}
-      onKeyDown={handleDownKey}
-      onKeyUp={handleUpKey}
-      tabIndex={0}
-    >
-      <Bunny letra={key} />
-    </Stage>
+    <div className="flex justify-center items-center h-screen">
+      <Stage
+        width={width}
+        height={height}
+        renderOnComponentChange={true}
+        onKeyDown={handleDownKey}
+        onKeyUp={handleUpKey}
+        tabIndex={0}
+      >
+        <Background width={width} height={height} />
+        <Bunny letra={key} />
+      </Stage>
+    </div>
   );
 }
 
-function Bunny({letra}) {
-  const [x, setX] = useState(0);
-  const [y, setY] = useState(0);
+function Background({ width, height }) {
+  return (
+    <Sprite
+      image="\png\BG.png"
+      width={width}
+      height={height}
+      x={0}
+      y={0}
+    ></Sprite>
+  );
+}
+
+function Bunny({ letra }) {
+  const papaNoelRun = [
+    "/png/Run (1).png",
+    "/png/Run (2).png",
+    "/png/Run (3).png",
+    "/png/Run (4).png",
+    "/png/Run (5).png",
+    "/png/Run (6).png",
+    "/png/Run (7).png",
+    "/png/Run (8).png",
+    "/png/Run (9).png",
+    "/png/Run (10).png",
+    "/png/Run (11).png",
+  ];
+
+  const papaNoelIdle = [
+    "/png/Idle (1).png",
+    "/png/Idle (2).png",
+    "/png/Idle (3).png",
+    "/png/Idle (4).png",
+    "/png/Idle (5).png",
+    "/png/Idle (6).png",
+    "/png/Idle (7).png",
+    "/png/Idle (8).png",
+    "/png/Idle (9).png",
+    "/png/Idle (10).png",
+    "/png/Idle (11).png",
+    "/png/Idle (12).png",
+    "/png/Idle (13).png",
+    "/png/Idle (14).png",
+    "/png/Idle (15).png",
+    "/png/Idle (16).png",
+  ];
+  const [x, setX] = useState(70);
+  const [y, setY] = useState(640);
+  const [papaNoel, setPapaNoel] = useState(papaNoelIdle);
+
+  useEffect(() => {
+
+    if (letra == "d" || letra == "a") {
+      setPapaNoel(papaNoelRun);
+    } else if (letra == "") {
+      setPapaNoel(papaNoelIdle);
+    }
+  }, [letra]);
+
   useTick((delta) => {
     if (letra == "d") {
-      setX(x + 1 * delta);
+      setX((x) => x + 2 * delta);
+      // setPapaNoel(animationRun);
     }
     if (letra == "a") {
-      console.log(letra)
-      setX(x - 1 * delta);
+      setX((x) => x - 2 * delta);
+      // setPapaNoel(animationRun);
     }
+
     if (letra == "w") {
-      setY(y - 1 * delta)
+      setY(y - 1 * delta);
     }
     if (letra == "s") {
-      setY(y + 1 * delta)
+      setY(y + 1 * delta);
+    }
+    if (letra == "") {
+      // setPapaNoel(animationIdle);
     }
   });
   return (
-    <Sprite
-      image="https://pixijs.io/pixi-react/img/bunny.png"
-      x={x}
-      y={y}
-      anchor={{ x: 0.5, y: 0.5 }}
-      
-    />
+    <Container position={[x, y]}>
+      <AnimatedSprite
+        key={papaNoel.length}
+        images={papaNoel}
+        isPlaying={true}
+        initialFrame={0}
+        animationSpeed={0.2}
+        width={150}
+        height={150}
+        anchor={{ x: 0.5, y: 0.5 }}
+      />    
+    </Container>
   );
 }
